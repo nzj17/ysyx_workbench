@@ -17,4 +17,6 @@ run: $(BIN)
 	$^
 fst: $(WAVENAME)
 	gtkwave $^
-
+lint:$(VSRCS)
+	verilator --cc --lint-only -Wall --top-module $(TOPNAME) --lint-only  -Wall $(VSRCS) 
+	

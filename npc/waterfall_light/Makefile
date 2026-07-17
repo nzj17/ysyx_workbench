@@ -1,4 +1,4 @@
-TOPNAME = double
+TOPNAME = light
 NXDC_FILES = constr/top.nxdc
 INC_PATH ?=
 
@@ -44,5 +44,9 @@ run: $(BIN)
 
 clean:
 	rm -rf $(BUILD_DIR)
+lint:$(VSRCS)
+	verilator --cc --lint-only -Wall --top-module $(TOPNAME) --lint-only  -Wall $(VSRCS) 
+	
 
-.PHONY: default all clean run
+.PHONY: default all clean run lint
+
