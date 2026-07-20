@@ -33,7 +33,7 @@ CXXFLAGS += $(INCFLAGS) -DTOP_NAME="\"V$(TOPNAME)\""
 
 $(BIN): $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
 	@rm -rf $(OBJ_DIR)
-	$(VERILATOR) $(VERILATOR_CFLAGS) \
+	$(VERILATOR) $(VERILATOR_C iFLAGS) \
 		--top-module $(TOPNAME) $^ \
 		$(addprefix -CFLAGS , $(CXXFLAGS)) $(addprefix -LDFLAGS , $(LDFLAGS)) \
 		--Mdir $(OBJ_DIR) --exe -o $(abspath $(BIN))
@@ -43,10 +43,12 @@ run: $(BIN)
 	@$^
 
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf $(BUILD_DIR) 
+	rm -rf /home/nzj17/ysyx-workbench/npc/waterfall_light/result
 lint:$(VSRCS)
 	verilator --cc --lint-only -Wall --top-module $(TOPNAME) --lint-only  -Wall $(VSRCS) 
-	
+sta:
+	make -C /home/nzj17/yosys-sta  sta DESIGN=light  SDC_FILE=/home/nzj17/ysyx-workbench/npc/waterfall_light/scripts/default.sdc  CLK_FREQ_MHZ=100 CLK_PORT_NAME=clk O=/home/nzj17/ysyx-workbench/npc/waterfall_light/result  RTL_FILES=/home/nzj17/ysyx-workbench/npc/waterfall_light/vsrc/light.v
 
-.PHONY: default all clean run lint
+.PHONY: default all clean run lint sta
 
