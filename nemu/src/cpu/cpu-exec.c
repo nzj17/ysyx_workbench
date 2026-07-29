@@ -23,7 +23,7 @@
  * This is useful when you use the `si' command.
  * You can modify this value as you want.
  */
-#define MAX_INST_TO_PRINT 10  
+#define MAX_INST_TO_PRINT 10
 
 CPU_state cpu = {};
 uint64_t g_nr_guest_inst = 0;
@@ -123,6 +123,6 @@ void cpu_exec(uint64_t n) {
             ANSI_FMT("HIT BAD TRAP", ANSI_FG_RED))),
           nemu_state.halt_pc);
       // fall through
-    case NEMU_QUIT: statifstic();
+    case NEMU_QUIT: statistic();
   }
 }

@@ -32,8 +32,8 @@ static void welcome() {
   Log("Build time: %s, %s", __TIME__, __DATE__);
   printf("Welcome to %s-NEMU!\n", ANSI_FMT(str(__GUEST_ISA__), ANSI_FG_YELLOW ANSI_BG_RED));
   printf("For help, type \"help\"\n");
-
-//  assert(0);
+  Log("Exercise: Please remove me in the source code and compile NEMU again.");
+  assert(0);
 }
 
 #ifndef CONFIG_TARGET_AM
@@ -59,7 +59,7 @@ static long load_img() {
   long size = ftell(fp);
 
   Log("The image is %s, size = %ld", img_file, size);
-411111111
+
   fseek(fp, 0, SEEK_SET);
   int ret = fread(guest_to_host(RESET_VECTOR), size, 1, fp);
   assert(ret == 1);
