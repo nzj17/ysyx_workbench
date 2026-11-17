@@ -18,6 +18,8 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "sdb.h"
+#include <memory/vaddr.h>
+extern void isa_reg_display(void);
 
 static int is_batch_mode = false;
 
@@ -33,7 +35,7 @@ static char* rl_gets() {
     line_read = NULL;
   }
 
-  line_read = readline("(nemu) ");
+  line_read = readline("(nemu) ");   //dynamic memory alloocation   free
 
   if (line_read && *line_read) {
     add_history(line_read);
@@ -49,10 +51,84 @@ static int cmd_c(char *args) {
 
 
 static int cmd_q(char *args) {
+  nemu_state.state = NEMU_QUIT;//4
   return -1;
 }
 
+
+
+
+static int cmd_si(char *args) {
+  uint64_t N;
+  
+  char *arg = strtok(args, " ");  
+  if (arg == NULL) {
+    N=1;
+  }
+
+
+  else {
+  char * end_error_byte;
+    if((*arg)=='-') {
+    printf("%s\n","include '-' sign");
+    return -1;
+  }
+
+  N=(uint64_t)strtoull(arg,&end_error_byte,10);
+
+  if(end_error_byte==arg || (*end_error_byte)!='\0') {
+    printf("%s\n","include invaild numbers");
+    return -1;
+  }
+  
+  }
+
+   cpu_exec(N);
+   return 0;
+}
+
+
+static int cmd_info(char *args) {
+
+  char *arg = strtok(args, " ");  
+  if (arg == NULL) {
+   printf("info r : Print register status \n");
+   printf("info w : Print watchpoint information \n");   
+   return -1;
+  }
+  else {
+ if(strcmp(arg,"r")){ isa_reg_display();}
+ else if(strcmp(arg,"r")) {}
+ else {printf(":error error error\n"); return -1;}
+}
+
+   return 0;
+}
+
+
+static int cmd_x(char * args) {
+  char *arg = strtok(args, " ");  
+  char * end_error_byte;
+ int number=(int)strtoull(arg,&end_error_byte,10);
+
+
+  char *e = strtok(NULL," ");
+  bool  success;
+  vaddr_t addr=expr(e, &success);  //EXPR value return_word_t
+  
+  for(int i=0;i<number;i++) {
+  printf("%#08x : %#08x\n",  addr,vaddr_read(addr, 4));
+   addr=addr+4;
+  }
+  return 0;
+}
+
+
+
+
 static int cmd_help(char *args);
+
+
 
 static struct {
   const char *name;
@@ -62,16 +138,23 @@ static struct {
   { "help", "Display information about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
+  {"si [N]","Program single-step execution",cmd_si},
+  {"info SUBCMD","Print register status and watchpoint information",cmd_info},
+  {"x N EXPR","Scan memory",cmd_x},
+ // {"p EXPR","Expression evaluation",cmd_p}, {"w EXPR","Set monitoring points",cmd_w}, {"d N","'Delete monitoring points",cmd_d},
 
   /* TODO: Add more commands */
 
-};
+}; 
 
 #define NR_CMD ARRLEN(cmd_table)
 
+
+//static int cmd_help(char *args);
+
 static int cmd_help(char *args) {
   /* extract the first argument */
-  char *arg = strtok(NULL, " ");
+  char *arg = strtok(NULL, " ");  //state_keeping function,continue to deal with str(char *)
   int i;
 
   if (arg == NULL) {
@@ -92,14 +175,25 @@ static int cmd_help(char *args) {
   return 0;
 }
 
+
+
+
 void sdb_set_batch_mode() {
   is_batch_mode = true;
 }
 
+
+
+
+
+
+
+
+
+
 void sdb_mainloop() {
   if (is_batch_mode) {
     cmd_c(NULL);
-    return;
   }
 
   for (char *str; (str = rl_gets()) != NULL; ) {
@@ -116,7 +210,7 @@ void sdb_mainloop() {
     if (args >= str_end) {
       args = NULL;
     }
-
+  
 #ifdef CONFIG_DEVICE
     extern void sdl_clear_event_queue();
     sdl_clear_event_queue();
@@ -133,6 +227,23 @@ void sdb_mainloop() {
     if (i == NR_CMD) { printf("Unknown command '%s'\n", cmd); }
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void init_sdb() {
   /* Compile the regular expressions. */

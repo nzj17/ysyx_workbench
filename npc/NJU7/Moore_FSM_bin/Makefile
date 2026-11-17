@@ -44,7 +44,7 @@ run: $(BIN)
 clean:
 	rm -rf $(BUILD_DIR)
 lint:$(VSRCS)
-	verilator --cc --lint-only -Wall --top-module $(TOPNAME) --lint-only  -Wall $(VSRCS) 
+	verilator --cc  --lint-only -Wall --top-module $(TOPNAME) --lint-only  -Wall $(VSRCS) 
 	
 
 .PHONY: default all clean run lint

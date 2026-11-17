@@ -20,7 +20,7 @@ $(SRC_AUTO_BIND): $(NXDC_FILES)
 	python3 $(NVBOARD_HOME)/scripts/auto_pin_bind.py $^ $@
 
 # project source
-VSRCS = ./vsrc/sum.v
+VSRCS = $(shell find $(abspath ./vsrc) -name "*.v" )
 CSRCS = $(shell find $(abspath ./csrc) -name "*.c" -or -name "*.cc" -or -name "*.cpp")
 CSRCS += $(SRC_AUTO_BIND)
 
@@ -39,11 +39,12 @@ $(BIN): $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE)
 		--Mdir $(OBJ_DIR) --exe -o $(abspath $(BIN))
 # verilator  -MMD --build -cc -O3 --x-assign fast --x-initial fast --noassert  --top-module top $(VSRCS) $(CSRCS) $(NVBOARD_ARCHIVE) $(addprefix -CFLAGS , $(addprefix-I, $(INC_PATH))) $(addprefix -LDFLAGS , $(LDFLAGS)) --Mdir ./build/obj_dir --exe -o $(abspath ./build/top)
 all: default
-     
+sta:
+	make -C /home/nzj17/yosys-sta  sta\ DESIGN=sum  SDC_FILE=/home/nzj17/ysyx-workbench/npc/sCPU/constr/default.sdc CLK_FREQ_MHZ=100 CLK_PORT_NAME=clk O=/home/nzj17/ysyx-workbench/npc/sCPU/result RTL_FILES=/home/nzj17/ysyx-workbench/sCPU/vsrc/light.v
 run: $(BIN)
 	@$^
 lint:$(VSRCS)
 	verilator --cc --lint-only -Wall --top-module $(TOPNAME) --lint-only  -Wall $(VSRCS) 
 clean:
 	rm -rf $(BUILD_DIR)
-.PHONY: default all clean run
+.PHONY: default all  sta clean run

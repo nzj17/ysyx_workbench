@@ -1,4 +1,4 @@
-STUID = ysyx2025008817
+STUID = ysyx_22040000
 STUNAME =Zejie Ning 
 
 # DO NOT modify the following code!!!
