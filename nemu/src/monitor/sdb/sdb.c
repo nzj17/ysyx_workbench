@@ -58,11 +58,11 @@ static int cmd_q(char *args) {
 
 
 static int cmd_si(char *args) {
-  char *arg = strtok(NULL, "]\n");  
+  char *arg = strtok(NULL, "\n");  
   int NR=0;
 if (arg == NULL) { NR=1;}
-else {int length=strlen(arg); //[499\0  //[7\0
-    for(int i=1;i<=length-1;i++){
+else {int length=strlen(arg); //499\0  //7\0
+    for(int i=0;i<=length-1;i++){
      int nr=(int)((*(arg+i))-'0');
      NR=NR*10+nr;  //^ not m方
      }}
