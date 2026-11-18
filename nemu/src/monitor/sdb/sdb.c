@@ -19,6 +19,7 @@
 #include <readline/history.h>
 #include "sdb.h"
 #include <memory/vaddr.h>
+#include <debug.h>
 extern void isa_reg_display(void);
 
 static int is_batch_mode = false;
@@ -56,37 +57,18 @@ static int cmd_q(char *args) {
 }
 
 
-
-
 static int cmd_si(char *args) {
-  uint64_t N;
-  
-  char *arg = strtok(args, " ");  
-  if (arg == NULL) {
-    N=1;
-  }
-
-
-  else {
-  char * end_error_byte;
-    if((*arg)=='-') {
-    printf("%s\n","include '-' sign");
-    return -1;
-  }
-
-  N=(uint64_t)strtoull(arg,&end_error_byte,10);
-
-  if(end_error_byte==arg || (*end_error_byte)!='\0') {
-    printf("%s\n","include invaild numbers");
-    return -1;
-  }
-  
-  }
-
-   cpu_exec(N);
+  char *arg = strtok(NULL, "]\n");  
+  int NR=0;
+if (arg == NULL) { NR=1;}
+else {int length=strlen(arg); //[499\0  //[7\0
+    for(int i=1;i<=length-1;i++){
+     int nr=(int)((*(arg+i))-'0');
+     NR=NR*10+nr;  //^ not m方
+     }}
+for(int i=1;i<=NR;i++) {cpu_exec(1);}
    return 0;
 }
-
 
 static int cmd_info(char *args) {
 
@@ -110,7 +92,6 @@ static int cmd_x(char * args) {
   char *arg = strtok(args, " ");  
   char * end_error_byte;
  int number=(int)strtoull(arg,&end_error_byte,10);
-
 
   char *e = strtok(NULL," ");
   bool  success;
@@ -138,9 +119,9 @@ static struct {
   { "help", "Display information about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
-  {"si [N]","Program single-step execution",cmd_si},
-  {"info SUBCMD","Print register status and watchpoint information",cmd_info},
-  {"x N EXPR","Scan memory",cmd_x},
+  {"si","Program single-step execution",cmd_si},
+  {"info","Print register status and watchpoint information",cmd_info},
+  {"x","Scan memory",cmd_x},
  // {"p EXPR","Expression evaluation",cmd_p}, {"w EXPR","Set monitoring points",cmd_w}, {"d N","'Delete monitoring points",cmd_d},
 
   /* TODO: Add more commands */
@@ -156,7 +137,6 @@ static int cmd_help(char *args) {
   /* extract the first argument */
   char *arg = strtok(NULL, " ");  //state_keeping function,continue to deal with str(char *)
   int i;
-
   if (arg == NULL) {
     /* no argument given */
     for (i = 0; i < NR_CMD; i ++) {
@@ -174,28 +154,13 @@ static int cmd_help(char *args) {
   }
   return 0;
 }
-
-
-
-
 void sdb_set_batch_mode() {
   is_batch_mode = true;
 }
-
-
-
-
-
-
-
-
-
-
 void sdb_mainloop() {
   if (is_batch_mode) {
     cmd_c(NULL);
   }
-
   for (char *str; (str = rl_gets()) != NULL; ) {
     char *str_end = str + strlen(str);
 
@@ -210,12 +175,10 @@ void sdb_mainloop() {
     if (args >= str_end) {
       args = NULL;
     }
-  
 #ifdef CONFIG_DEVICE
     extern void sdl_clear_event_queue();
     sdl_clear_event_queue();
 #endif
-
     int i;
     for (i = 0; i < NR_CMD; i ++) {
       if (strcmp(cmd, cmd_table[i].name) == 0) {
@@ -223,28 +186,9 @@ void sdb_mainloop() {
         break;
       }
     }
-
     if (i == NR_CMD) { printf("Unknown command '%s'\n", cmd); }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 void init_sdb() {
   /* Compile the regular expressions. */
   init_regex();
