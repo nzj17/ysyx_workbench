@@ -66,25 +66,22 @@ else {int length=strlen(arg); //499\0  //7\0
      int nr=(int)((*(arg+i))-'0');
      NR=NR*10+nr;  //^ not m方
      }}
-for(int i=1;i<=NR;i++) {cpu_exec(1);}
+for(int i=1;i<=NR;i++) {cpu_exec(1);} //NR==0,dnt exec hhh
    return 0;
 }
 
 static int cmd_info(char *args) {
-
-  char *arg = strtok(args, " ");  
+  char *arg = strtok(NULL, "\n");  
   if (arg == NULL) {
    printf("info r : Print register status \n");
    printf("info w : Print watchpoint information \n");   
-   return -1;
+   return 0;
   }
   else {
- if(strcmp(arg,"r")){ isa_reg_display();}
- else if(strcmp(arg,"r")) {}
- else {printf(":error error error\n"); return -1;}
+ if(strcmp(arg,"r")==0){ isa_reg_display();}
+ else {printf(":error error error\n");}
 }
-
-   return 0;
+return 0;
 }
 
 

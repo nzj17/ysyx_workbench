@@ -29,7 +29,6 @@ typedef concat(__GUEST_ISA__, _ISADecodeInfo) ISADecodeInfo;
 // monitor
 extern unsigned char isa_logo[];
 void init_isa();
-
 // reg
 extern CPU_state cpu;
 void isa_reg_display();
@@ -58,14 +57,6 @@ bool isa_difftest_checkregs(CPU_state *ref_r, vaddr_t pc);
 void isa_difftest_attach();
 
 #endif
-
-
-
-
-
-
-
-
 //#include "local-include/reg.h"
 
 #ifndef __RISCV_REG_H__
@@ -86,13 +77,19 @@ static inline const char* reg_name(int idx) {
 }
 
 #endif
-
-
-
-
-
-
-
+//索引 代码中名字 ABI名 含义/约定
+//x0 $0 zero 硬连线为 0，写入无效；不是“立即数为零的默认目标”，而是常量零寄存器
+//x1 ra ra 返回地址，函数调用时保存返回地址
+//x2 sp sp 栈指针，指向栈顶
+//x3 gp gp 全局指针，通常指向全局数据区
+//x4 tp tp 线程指针，线程局部存储等使用
+//x5-x7 t0-t2 t0-t2 临时寄存器，caller-saved
+//x8 s0 s0/fp 保存寄存器；常可作帧指针 fp，但是否作为 fp 取决于编译器约定
+//x9 s1 s1 保存寄存器，callee-saved
+//x10-x17 a0-a7 a0-a7 参数寄存器；其中 a0、a1 也用于函数返回值
+//x18-x27 s2-s11 s2-s11 保存寄存器，callee-saved
+//x28-x31 t3-t6 t3-t6 临时寄存器，caller-saved
+//x1 x2 x3 x4  地址
 const char *regs[] = {
   "$0", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
   "s0", "s1", "a0", "a1", "a2", "a3", "a4", "a5",
@@ -102,10 +99,12 @@ const char *regs[] = {
 
 void isa_reg_display() {
 for(int i=0;i<32;i++) {
-    printf("%s = %d\n",regs[i],cpu.gpr[i]); 
+   if(i==1||i==2||i==3||i==4) {
+printf("%-5s\t0x%08x\t0x%08x\n",regs[i],cpu.gpr[i],cpu.gpr[i]);}
+   else {printf("%-5s\t0x%08x\t%u\n",regs[i],cpu.gpr[i],cpu.gpr[i]);}
+}//32 bin : u 0-4294967295
+ printf("PC   \t0x%08x\t0x%08x\n",cpu.pc,cpu.pc); 
 }
-}
-
 word_t isa_reg_str2val(const char *s, bool *success) {
   return 0;
 }
