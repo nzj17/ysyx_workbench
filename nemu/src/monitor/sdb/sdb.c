@@ -49,8 +49,6 @@ static int cmd_c(char *args) {
   cpu_exec(-1);
   return 0;
 }
-
-
 static int cmd_q(char *args) {
   nemu_state.state = NEMU_QUIT;//4
   return -1;
@@ -65,7 +63,9 @@ else {int length=strlen(arg); //"499"\0  //"7"\0
      int nr=(int)((*(arg+i))-'0');
      NR=NR*10+nr;  //^ not m方
      }}
-for(int i=1;i<=NR;i++) {cpu_exec(1);} //NR==0,dnt exec hhh
+    cpu_exec(NR); 
+//NR>=10,only put:nemu: HIT GOOD TRAP at pc = 0x8000000c
+//NR==0,dnt exec hhh
    return 0;
 }
 
@@ -78,7 +78,7 @@ static int cmd_info(char *args) {
   }
   else {
  if(strcmp(arg,"r")==0){ isa_reg_display();}
- else {printf(":error error error\n");}
+ else {printf("error: is not r\n");}
 }
 return 0;
 }

@@ -17,7 +17,6 @@
 #include <memory/paddr.h>
 #include <device/mmio.h>
 #include <isa.h>
-
 #if   defined(CONFIG_PMEM_MALLOC) 
 static uint8_t *pmem = NULL;
 #else // CONFIG_PMEM_GARRAY
@@ -25,15 +24,18 @@ static uint8_t *pmem = NULL;
 static uint8_t pmem[CONFIG_MSIZE] PG_ALIGN = {};
 //pmem array .+index is menu-computer memory虚拟Vaddr
 //0   1   ... ..134,217,728-1=7FFFFFF
-//0x0 0x1 ... ..0x8000000-1  实际物理内存编号从0开始的host？?<<< guest_to_host函数(menu物理Paddr) 转
-//0x80000000 ...0x88000000-1 menu-computer memory物理Paddr<<<虚拟Paddr=paddr 转
+//0x0 0x1 ... ..0x8000000-1  array-index从0始的host<<< guest_to_host函数(menu物理Paddr)
+//0x80000000 ...0x88000000-1 menu-computer memory物理Paddr<<<虚拟Paddr=paddr 
 //0x80000000 ...0x88000000-1 menu-computer memory虚拟Paddr 
 
 //i don‘t know 实际的虚拟机对应的物理addr after all
 //0x0x7fffefbff010(rand)...实际linux的gcc给的PMEM数组的虚拟addr《malloc》
-//nemu-computer 的memory地址 include 物理Paddr和虚拟Vaddr
-//关于x扫描：虚拟vaddr要先转为nemu的物理paddr。
-//i feel 只有把抽象的虚拟addr转成实际的物理addr才能通过解引用(这里内存是c-array)获得memory data
+//关于x扫描：nemu-computer虚拟vaddr要先转为nemu的物理paddr。
+//i feel 只有把nemu抽象的虚拟addr转成nemu实际的物理addr(这里内存是c-array，解引用)获得memory data
+
+//(vaddr_t pc):pc-register is nemu物理内存的指令addr
+//0x80000000 0x8000004 0x80000008 ...+4(bytes)
+
 #endif  
 uint8_t* guest_to_host(paddr_t paddr) 
 { return pmem + (paddr - CONFIG_MBASE); } 
@@ -50,6 +52,10 @@ static void out_of_bound(paddr_t addr) {
   panic("address = " FMT_PADDR " is out of bound of pmem [" FMT_PADDR ", " FMT_PADDR "] at pc = " FMT_WORD,
       addr, PMEM_LEFT, PMEM_RIGHT, cpu.pc);
 } 
+// in debug.h ,  #define panic(format, ...) Assert(0, format, ## __VA_ARGS__)
+// Assert macro 触发 assert_fail_msg(),use isa_reg_display() printf values of registers
+// in cpu-exec.c,  void assert_fail_msg() { isa_reg_display(); statistic();}
+
 void init_mem() {
 #if   defined(CONFIG_PMEM_MALLOC) //y
   pmem = malloc(CONFIG_MSIZE);
