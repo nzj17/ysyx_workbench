@@ -16,6 +16,8 @@
 #include <isa.h>
 #include <memory/paddr.h>
 
+////vaddr=paddr，应该对吧
+//x命令input的虚拟地址，先转成nemu的memory物理地址
 word_t vaddr_ifetch(vaddr_t addr, int len) {
   return paddr_read(addr, len);
 }

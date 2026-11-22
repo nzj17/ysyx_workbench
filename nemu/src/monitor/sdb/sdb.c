@@ -56,12 +56,11 @@ static int cmd_q(char *args) {
   return -1;
 }
 
-
 static int cmd_si(char *args) {
   char *arg = strtok(NULL, "\n");  
   int NR=0;
 if (arg == NULL) { NR=1;}
-else {int length=strlen(arg); //499\0  //7\0
+else {int length=strlen(arg); //"499"\0  //"7"\0
     for(int i=0;i<=length-1;i++){
      int nr=(int)((*(arg+i))-'0');
      NR=NR*10+nr;  //^ not m方
@@ -83,25 +82,33 @@ static int cmd_info(char *args) {
 }
 return 0;
 }
-
-
 static int cmd_x(char * args) {
-  char *arg = strtok(args, " ");  
-  char * end_error_byte;
- int number=(int)strtoull(arg,&end_error_byte,10);
-
-  char *e = strtok(NULL," ");
-  bool  success;
-  vaddr_t addr=expr(e, &success);  //EXPR value return_word_t
-  
-  for(int i=0;i<number;i++) {
-  printf("%#08x : %#08x\n",  addr,vaddr_read(addr, 4));
-   addr=addr+4;
+  char *arg= strtok(NULL, " "); 
+  int N=0;
+  sscanf(arg,"%u",&N);
+  char *nemu_virtual_gcc_addr = strtok(NULL," "); 
+  //x指令我应该输入的是已经抽象了的虚拟内存地址
+  //类似于(gdb) x /10x  0x7fffefbff010，这里的addr是实际gcc或C语言cause的虚拟地址，如&peme[2];
+  //我不知道虚拟机的对应的实际paddr， is not it？
+  vaddr_t addr=0;
+  sscanf(nemu_virtual_gcc_addr,"%x",&addr);
+  for(int i=0;i<N;i++) {
+    word_t ret=vaddr_read(addr+4*i,4);
+    if((4*i)%16==0) {
+      printf("0x%08x 0x%08x      ",addr+4*i,ret);
+      if(i==N-1){printf("\n");}
+    }
+    else if((4*i+4)%16==0) {
+      printf("0x%08x\n",ret);
+      if(i==N-1){printf("\n");}
+    } 
+    else if(i==N-1) {
+      printf("0x%08x\n",ret);
+    }
+    else printf("0x%08x      ",ret);
   }
   return 0;
 }
-
-
 
 
 static int cmd_help(char *args);

@@ -25,11 +25,22 @@ static const uint32_t img [] = {
   0x00100073,  // ebreak (used as nemu_trap)
   0xdeadbeef,  // some data
 };
-
+//(gdb) b init_isa
+//Breakpoint 1 at 0x509d: file src/isa/riscv32/init.c, line 37.
+//(gdb) run
+//(gdb) print pmem
+//(uint8_t *) 0x7fffefbff010 "\227\002"
+//(gdb) p/x pmem[0]= 0x97
+//(gdb) p/x pmem[1]= 0x2
+//(gdb) p/x pmem[2]= 0x0
+//(gdb) p/x pmem[3]= 0x0
+//(gdb) p/x pmem[4]= 0x23
+//(gdb) p/x pmem[5]= 0x88
+//(gdb) p/x pmem[6]= 0x2
+//(gdb) p/x pmem[7]= 0x0
 static void restart() {
   /* Set the initial program counter. */
   cpu.pc = RESET_VECTOR;
-
   /* The zero register is always 0. */
   cpu.gpr[0] = 0;
 }
