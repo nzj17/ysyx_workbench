@@ -41,3 +41,10 @@
 #define TODO() panic("please implement me")
 
 #endif
+
+// __VA_ARGS__ is empty, ## swallows front ,
+//#define _Log(...) do { printf(__VA_ARGS__); log_write(__VA_ARGS__); } while (0)
+//printf(ANSI_FG_BLUE "[%s:%d %s] " format ANSI_NONE "\n", __FILE__, __LINE__, __func__, ## __VA_ARGS__)
+
+//cond==0,assert and Assert is on
+//printf(ANSI_FG_RED,format,ANSI_NONE) "\n", ## __VA_ARGS__);

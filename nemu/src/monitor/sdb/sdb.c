@@ -41,10 +41,8 @@ static char* rl_gets() {
   if (line_read && *line_read) {
     add_history(line_read);
   }
-
   return line_read;
 }
-
 static int cmd_c(char *args) {
   cpu_exec(-1);
   return 0;
@@ -110,10 +108,19 @@ static int cmd_x(char * args) {
   return 0;
 }
 
-
+static int cmd_p(char *args){
+  char *arg= strtok(NULL, " "); 
+  return 0;
+}
+static int cmd_w(char *args) {
+  char *arg= strtok(NULL, " "); 
+  return 0;
+}
+static int cmd_d(char *args) {
+  char *arg= strtok(NULL, " "); 
+  return 0;
+}
 static int cmd_help(char *args);
-
-
 
 static struct {
   const char *name;
@@ -126,15 +133,15 @@ static struct {
   {"si","Program single-step execution",cmd_si},
   {"info","Print register status and watchpoint information",cmd_info},
   {"x","Scan memory",cmd_x},
- // {"p EXPR","Expression evaluation",cmd_p}, {"w EXPR","Set monitoring points",cmd_w}, {"d N","'Delete monitoring points",cmd_d},
+  {"p","Expression evaluation",cmd_p}, 
+  {"w","Set monitoring points",cmd_w}, 
+  {"d","'Delete monitoring points",cmd_d},
 
   /* TODO: Add more commands */
 
 }; 
 
 #define NR_CMD ARRLEN(cmd_table)
-
-
 //static int cmd_help(char *args);
 
 static int cmd_help(char *args) {

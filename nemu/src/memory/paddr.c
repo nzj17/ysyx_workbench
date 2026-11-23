@@ -33,9 +33,17 @@ static uint8_t pmem[CONFIG_MSIZE] PG_ALIGN = {};
 //关于x扫描：nemu-computer虚拟vaddr要先转为nemu的物理paddr。
 //i feel 只有把nemu抽象的虚拟addr转成nemu实际的物理addr(这里内存是c-array，解引用)获得memory data
 
-//(vaddr_t pc):pc-register is nemu物理内存的指令addr
+//(vaddr_t pc):pc-register is nemu物理内存的指令addr(when off MMU)
 //0x80000000 0x8000004 0x80000008 ...+4(bytes)
 
+//(gdb) print main = {int (int, char **)} 0x555555556589 <main>
+// (gdb) info r 
+//rip            0x555555556589      0x555555556589 <main>
+//rip            0x5555555565a0      0x5555555565a0 <main+23> X86d变长度instr
+//23=rip-main
+//rip就是pc，只不过rip是虚拟addr，rip=rip+size_t(instr),X86d变长度instr
+//(gdb)print is_exit_status_bad{int ()} 0x5555555587a2 <is_exit_status_bad>
+//rip  0x5555555587a6  0x5555555587a6 <is_exit_status_bad+4>
 #endif  
 uint8_t* guest_to_host(paddr_t paddr) 
 { return pmem + (paddr - CONFIG_MBASE); } 
