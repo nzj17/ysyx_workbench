@@ -141,6 +141,12 @@ static struct {
 
 }; 
 
+extern word_t(int p,int q,bool success); 
+static  static int cmd_p(char *args) {
+ printf("Expression evaluation\n");
+ strtok("")
+}
+
 #define NR_CMD ARRLEN(cmd_table)
 //static int cmd_help(char *args);
 
