@@ -21,7 +21,7 @@
 #include <memory/vaddr.h>
 #include <debug.h>
 extern void isa_reg_display(void);
-
+extern word_t expr(char *e, bool *success);
 static int is_batch_mode = false;
 
 void init_regex();
@@ -85,9 +85,8 @@ static int cmd_x(char * args) {
   int N=0;
   sscanf(arg,"%u",&N);
   char *nemu_virtual_gcc_addr = strtok(NULL," "); 
-  //x指令我应该输入的是已经抽象了的虚拟内存地址
-  //类似于(gdb) x /10x  0x7fffefbff010，这里的addr是实际gcc或C语言cause的虚拟地址，如&peme[2];
-  //我不知道虚拟机的对应的实际paddr， is not it？
+  //nemu cmd_x指令我应该输入的是已经抽象了的虚拟内存地址
+  //类似于(gdb) x /10x  0x7fffefbff010，这里的addr是实际gcc或C语言cause的虚拟地址，如&peme[2];我不知道虚拟机的对应的实际paddr
   vaddr_t addr=0;
   sscanf(nemu_virtual_gcc_addr,"%x",&addr);
   for(int i=0;i<N;i++) {
@@ -110,8 +109,15 @@ static int cmd_x(char * args) {
 
 static int cmd_p(char *args){
   char *arg= strtok(NULL, " "); 
+  bool success;
+  word_t my_expr_result=expr(arg,&success);
+  if(success) { printf("my_expr_result:%u\n",my_expr_result); }
+  else {
+  Assert(success==true,"make_token() or eval() fail in expr.c , which cause bool* success is false");
+  }
   return 0;
 }
+/*
 static int cmd_w(char *args) {
   char *arg= strtok(NULL, " "); 
   return 0;
@@ -119,7 +125,7 @@ static int cmd_w(char *args) {
 static int cmd_d(char *args) {
   char *arg= strtok(NULL, " "); 
   return 0;
-}
+} */
 static int cmd_help(char *args);
 
 static struct {
@@ -134,18 +140,13 @@ static struct {
   {"info","Print register status and watchpoint information",cmd_info},
   {"x","Scan memory",cmd_x},
   {"p","Expression evaluation",cmd_p}, 
-  {"w","Set monitoring points",cmd_w}, 
-  {"d","'Delete monitoring points",cmd_d},
+/*  {"w","Set monitoring points",cmd_w}, 
+  {"d","'Delete monitoring points",cmd_d}, */
 
   /* TODO: Add more commands */
 
 }; 
 
-extern word_t(int p,int q,bool success); 
-static  static int cmd_p(char *args) {
- printf("Expression evaluation\n");
- strtok("")
-}
 
 #define NR_CMD ARRLEN(cmd_table)
 //static int cmd_help(char *args);

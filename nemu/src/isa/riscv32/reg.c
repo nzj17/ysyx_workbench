@@ -98,7 +98,6 @@ const char *regs[] = {
 };
 
 void isa_reg_display() {
-  printf("yausfpao iujiaio");
 for(int i=0;i<32;i++) {
    if(i==1||i==2||i==3||i==4) {
 printf("%-5s\t0x%08x\t0x%08x\n",regs[i],cpu.gpr[i],cpu.gpr[i]);}
